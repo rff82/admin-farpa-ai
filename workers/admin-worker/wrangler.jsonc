@@ -1,0 +1,35 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "admin-farpa-ai",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-04-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "observability": { "enabled": true },
+  "routes": [
+    { "pattern": "admin.farpa.ai/oauth/*", "zone_name": "farpa.ai" },
+    { "pattern": "admin.farpa.ai/.well-known/*", "zone_name": "farpa.ai" },
+    { "pattern": "admin.farpa.ai/health", "zone_name": "farpa.ai" },
+    { "pattern": "admin.farpa.ai/admin/*", "zone_name": "farpa.ai" }
+  ],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "admin-farpa-ai-db",
+      "database_id": "b97347c2-528a-432e-a988-d133492ea79a"
+    }
+  ],
+  "kv_namespaces": [
+    {
+      "binding": "CACHE",
+      "id": "736560ba31d64d4dabfcd2630aebfd06"
+    }
+  ],
+  "vars": {
+    "ISSUER": "https://admin.farpa.ai",
+    "ALLOWED_ORIGINS": "https://farpa.ai,https://labs.farpa.ai,https://health.farpa.ai,https://fintech.farpa.ai,https://library.farpa.ai,https://forte.farpa.ai,https://teste.farpa.ai,https://docs.farpa.ai",
+    "SESSION_TTL_SECONDS": "2592000",
+    "ACCESS_TOKEN_TTL_SECONDS": "3600",
+    "REFRESH_TOKEN_TTL_SECONDS": "2592000",
+    "AUTH_CODE_TTL_SECONDS": "60"
+  }
+}
