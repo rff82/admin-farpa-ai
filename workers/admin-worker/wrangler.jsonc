@@ -5,12 +5,11 @@
   "compatibility_date": "2026-04-01",
   "compatibility_flags": ["nodejs_compat"],
   "observability": { "enabled": true },
-  "routes": [
-    { "pattern": "admin.farpa.ai/oauth/*", "zone_name": "farpa.ai" },
-    { "pattern": "admin.farpa.ai/.well-known/*", "zone_name": "farpa.ai" },
-    { "pattern": "admin.farpa.ai/health", "zone_name": "farpa.ai" },
-    { "pattern": "admin.farpa.ai/admin/*", "zone_name": "farpa.ai" }
-  ],
+  "workers_dev": true,
+  // NOTE: Routes admin.farpa.ai/oauth/* → admin-farpa-ai precisam ser ligadas
+  // via dashboard ou token com Workers Routes:Edit. ISSUER permanece
+  // https://admin.farpa.ai pois as routes serão acopladas manualmente na
+  // zona farpa.ai (Pages continua servindo / e /login.html).
   "d1_databases": [
     {
       "binding": "DB",
