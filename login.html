@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<!-- farpa.ai · admin-farpa-ai · login.html · v0.1 · 2026-04-18 · stub -->
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0B0B12">
+<meta name="robots" content="noindex,nofollow">
+<title>Entrar · farpa Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="themes.css">
+<link rel="stylesheet" href="logo-system.css">
+<link rel="stylesheet" href="admin.css">
+<style>
+  .login-wrap { min-height: 100vh; display: grid; place-items: center; padding: 32px; position: relative; z-index: 1; }
+  .login-card {
+    width: 100%; max-width: 420px;
+    padding: 40px 36px;
+    background: var(--admin-bg-elev);
+    border: 1px solid var(--admin-border);
+    border-radius: 18px;
+    box-shadow: 0 20px 60px -20px rgba(0,0,0,0.5);
+  }
+  .login-title { font-size: 24px; font-weight: 700; margin: 18px 0 6px; letter-spacing: -0.01em; }
+  .login-sub { color: var(--admin-text-2); font-size: 14px; margin: 0 0 28px; line-height: 1.5; }
+  .social-btn {
+    width: 100%;
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    padding: 12px 14px; margin-bottom: 10px;
+    background: transparent;
+    border: 1px solid var(--admin-border);
+    color: var(--admin-text-1);
+    border-radius: 10px;
+    font: inherit; font-size: 14px; font-weight: 500;
+    cursor: pointer; transition: all 160ms;
+    opacity: 0.55;
+  }
+  .social-btn[disabled] { cursor: not-allowed; }
+  .soon-badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase;
+    padding: 2px 8px; border-radius: 999px;
+    background: color-mix(in srgb, var(--admin-primary) 20%, transparent);
+    color: var(--admin-primary);
+    margin-left: auto;
+  }
+  .login-note {
+    margin-top: 24px; padding: 14px 16px;
+    background: color-mix(in srgb, var(--admin-primary) 10%, transparent);
+    border-left: 3px solid var(--admin-primary);
+    border-radius: 0 10px 10px 0;
+    font-size: 13px; color: var(--admin-text-2); line-height: 1.55;
+  }
+  .login-footer-link {
+    display: inline-flex; align-items: center; gap: 6px;
+    margin-top: 24px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--admin-text-3);
+  }
+  .login-footer-link:hover { color: var(--admin-text-1); }
+  .login-footer-link [data-icon] { width: 12px; height: 12px; }
+  .login-footer-link [data-icon] svg { width: 100%; height: 100%; }
+</style>
+</head>
+<body>
+
+<div class="login-wrap">
+  <div class="login-card">
+    <a href="/" class="farpa-logo" style="--logo-mark-bg: var(--admin-primary);">
+      <div class="farpa-logo-mark farpa-logo-mark--lg">A</div>
+      <div class="farpa-logo-text">
+        <span class="farpa-logo-wordmark">farpa</span>
+        <span class="farpa-logo-sublabel">admin.farpa.ai</span>
+      </div>
+    </a>
+
+    <h1 class="login-title">Entrar no ecossistema</h1>
+    <p class="login-sub">Autenticação centralizada para todos os produtos farpa — OAuth2/OIDC com PKCE.</p>
+
+    <button class="social-btn" disabled type="button" aria-label="Entrar com Google (em breve)">
+      <span data-icon="user"></span>
+      <span>Continuar com Google</span>
+      <span class="soon-badge">Soon</span>
+    </button>
+    <button class="social-btn" disabled type="button" aria-label="Entrar com Apple (em breve)">
+      <span data-icon="user"></span>
+      <span>Continuar com Apple</span>
+      <span class="soon-badge">Soon</span>
+    </button>
+    <button class="social-btn" disabled type="button" aria-label="Entrar com Microsoft (em breve)">
+      <span data-icon="user"></span>
+      <span>Continuar com Microsoft</span>
+      <span class="soon-badge">Soon</span>
+    </button>
+
+    <div class="login-note">
+      <strong>Fase 5B:</strong> o IdP OAuth2/OIDC (Worker + D1 + KV) está em implementação. Esta página é o stub público. Endpoints <code>/oauth/authorize</code>, <code>/.well-known/openid-configuration</code> e <code>/.well-known/jwks.json</code> serão ativados em seguida.
+    </div>
+
+    <a class="login-footer-link" href="/">
+      <span data-icon="arrow-left"></span>
+      <span>Voltar ao console</span>
+    </a>
+  </div>
+</div>
+
+<script src="icons.js"></script>
+</body>
+</html>

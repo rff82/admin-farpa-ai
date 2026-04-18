@@ -1,0 +1,148 @@
+# .github/workflows/ci.yml — admin-farpa-ai
+# Produto: farpa Admin · admin.farpa.ai
+# REGRA MESTRE: CI self-healing — falhas viram entrada em "## HISTÓRICO DE FALHAS DE CI"
+# do CLAUDE.md local. Ver farpa-reengenharia/06-operacional/09-ci-self-healing.md
+name: Deploy admin.farpa.ai
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy-pages:
+    name: Deploy Cloudflare Pages
+    runs-on: ubuntu-latest
+    outputs:
+      status:    ${{ steps.set-status.outputs.status }}
+      error_log: ${{ steps.capture.outputs.error_log }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install Wrangler
+        run: npm install -g wrangler
+
+      - name: Deploy Pages
+        id: deploy
+        run: wrangler pages deploy . --project-name farpa-admin --branch main 2>&1 | tee deploy-pages.log
+        env:
+          CLOUDFLARE_API_TOKEN:  ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+      - name: Capture error log on failure
+        id: capture
+        if: failure()
+        run: |
+          echo "error_log<<EOF" >> $GITHUB_OUTPUT
+          tail -n 80 deploy-pages.log >> $GITHUB_OUTPUT || echo "no log captured" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Set status
+        id: set-status
+        if: always()
+        run: echo "status=${{ job.status }}" >> $GITHUB_OUTPUT
+
+      - name: Upload deploy log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: deploy-pages-log
+          path: deploy-pages.log
+          retention-days: 14
+
+  # ── Self-healing: falha → documenta em CLAUDE.md + abre issue ──
+  record-failure:
+    name: Record failure in CLAUDE.md
+    needs: [deploy-pages]
+    if: failure()
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues:   write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Append failure entry to CLAUDE.md
+        env:
+          PAGES_STATUS: ${{ needs.deploy-pages.outputs.status }}
+          PAGES_LOG:    ${{ needs.deploy-pages.outputs.error_log }}
+          RUN_URL:      ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          COMMIT:       ${{ github.sha }}
+        run: |
+          set -e
+          DATE=$(date -u +"%Y-%m-%d %H:%MZ")
+          SHORT_SHA=$(echo "$COMMIT" | cut -c1-7)
+          SEP="---"
+
+          if ! grep -q "^## HISTÓRICO DE FALHAS DE CI" CLAUDE.md; then
+            {
+              echo ""
+              echo "$SEP"
+              echo ""
+              echo "## HISTÓRICO DE FALHAS DE CI"
+              echo "> Registro automático escrito pelo job \`record-failure\` em \`.github/workflows/ci.yml\`."
+              echo "> Cada entrada abaixo foi uma falha real — consultar antes de repetir mesma operação."
+            } >> CLAUDE.md
+          fi
+
+          {
+            echo ""
+            echo "### ${DATE} · commit ${SHORT_SHA}"
+            echo ""
+            echo "- **Pages:** ${PAGES_STATUS:-skipped}"
+            echo "- **Run:** ${RUN_URL}"
+            echo ""
+            if [ -n "${PAGES_LOG:-}" ]; then
+              echo "<details><summary>Log Pages (últimas linhas)</summary>"
+              echo ""
+              echo '```'
+              echo "${PAGES_LOG}"
+              echo '```'
+              echo ""
+              echo "</details>"
+            fi
+            echo ""
+            echo "> **TODO:** após corrigir, registrar a lição aprendida logo abaixo (1 linha)."
+          } >> CLAUDE.md
+
+      - name: Commit entry
+        run: |
+          git config user.name  "admin-ci-bot"
+          git config user.email "ci-bot@admin.farpa.ai"
+          git add CLAUDE.md
+          if git diff --cached --quiet; then
+            echo "Nenhuma alteração a registrar."
+          else
+            git commit -m "docs(ci): registra falha em CLAUDE.md · run ${{ github.run_id }} [skip ci]"
+            git push
+          fi
+
+      - name: Open tracking issue
+        uses: actions/github-script@v7
+        env:
+          PAGES_STATUS: ${{ needs.deploy-pages.outputs.status }}
+        with:
+          script: |
+            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            const pages  = process.env.PAGES_STATUS || 'skipped';
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo:  context.repo.repo,
+              title: `CI falhou em ${context.sha.substring(0,7)} — Pages: ${pages}`,
+              body: [
+                `Falha de CI registrada no CLAUDE.md automaticamente.`,
+                ``,
+                `- Commit: ${context.sha}`,
+                `- Run: ${runUrl}`,
+                `- Pages: **${pages}**`,
+                ``,
+                `Consultar seção \`## HISTÓRICO DE FALHAS DE CI\` no CLAUDE.md para o log capturado.`,
+                `Após corrigir, editar a entrada com a lição aprendida (1 linha).`,
+              ].join('\n'),
+              labels: ['ci-failure','automated']
+            });

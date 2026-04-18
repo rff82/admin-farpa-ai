@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<!-- farpa.ai · admin-farpa-ai · index.html · v0.1 · 2026-04-18 -->
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0B0B12">
+<meta name="description" content="Console do Ecossistema farpa — status, acesso e identidade centralizada (admin.farpa.ai)">
+<meta name="robots" content="noindex,follow">
+<title>Console · farpa Admin</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%234338CA'/%3E%3Ctext x='12' y='17' text-anchor='middle' font-family='monospace' font-weight='700' font-size='14' fill='white'%3EA%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="themes.css">
+<link rel="stylesheet" href="logo-system.css">
+<link rel="stylesheet" href="admin.css">
+</head>
+<body>
+
+<header class="admin-header">
+  <div class="admin-header-left">
+    <a href="/" class="farpa-logo" style="--logo-mark-bg: var(--admin-primary);">
+      <div class="farpa-logo-mark farpa-logo-mark--md">A</div>
+      <div class="farpa-logo-text">
+        <span class="farpa-logo-wordmark">farpa</span>
+        <span class="farpa-logo-sublabel">admin</span>
+      </div>
+    </a>
+    <div class="admin-eyebrow">Console do Ecossistema</div>
+  </div>
+  <div class="admin-header-actions">
+    <button class="admin-btn" id="btn-alto-contraste" type="button" aria-pressed="false" aria-label="Ativar alto contraste">
+      <span data-icon="contrast"></span>
+      <span>Alto contraste</span>
+    </button>
+    <a class="admin-btn admin-btn--primary" href="login.html">
+      <span data-icon="log-in"></span>
+      <span>Entrar</span>
+    </a>
+  </div>
+</header>
+
+<main class="admin-main">
+
+  <section class="console-hero">
+    <div class="console-kicker">admin.farpa.ai · Identity Provider</div>
+    <h1 class="console-title">
+      Uma identidade. <span>Todo o ecossistema.</span>
+    </h1>
+    <p class="console-sub">
+      O admin centraliza autenticação, autorização e visibilidade de todos os produtos farpa. Entre uma vez, acesse todos — com OAuth2/OIDC, PKCE e MFA opcional rodando no edge da Cloudflare.
+    </p>
+  </section>
+
+  <div class="stats-row" id="stats-row">
+    <div class="stat-card">
+      <div class="stat-value" id="stat-total">—</div>
+      <div class="stat-label">Produtos</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" id="stat-live">—</div>
+      <div class="stat-label">No ar</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" id="stat-building">—</div>
+      <div class="stat-label">Em construção</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" id="stat-ideation">—</div>
+      <div class="stat-label">Em ideação</div>
+    </div>
+  </div>
+
+  <div class="section-head">
+    <h2 class="section-title-h2">Produtos do ecossistema</h2>
+    <div class="section-meta" id="last-updated">carregando…</div>
+  </div>
+
+  <div class="filter-tabs" role="tablist" aria-label="Filtrar por status">
+    <button class="filter-tab is-active" data-filter="all" role="tab" aria-selected="true">Todos <span class="filter-tab-count" id="count-all">0</span></button>
+    <button class="filter-tab" data-filter="live" role="tab" aria-selected="false">No ar <span class="filter-tab-count" id="count-live">0</span></button>
+    <button class="filter-tab" data-filter="building" role="tab" aria-selected="false">Em construção <span class="filter-tab-count" id="count-building">0</span></button>
+    <button class="filter-tab" data-filter="planned" role="tab" aria-selected="false">Planejado <span class="filter-tab-count" id="count-planned">0</span></button>
+    <button class="filter-tab" data-filter="ideation" role="tab" aria-selected="false">Ideação <span class="filter-tab-count" id="count-ideation">0</span></button>
+  </div>
+
+  <div class="product-grid" id="product-grid" role="list" aria-live="polite">
+    <!-- populado via JS -->
+  </div>
+
+</main>
+
+<footer class="admin-footer">
+  <span>admin.farpa.ai · Console do Ecossistema · v0.1</span>
+  <span>OAuth2 · OIDC · PKCE · MFA · <a href="https://farpa.ai">farpa.ai</a></span>
+</footer>
+
+<script src="icons.js"></script>
+<script>
+(function(){
+  const STATUS_LABEL = { live: 'No ar', building: 'Em construção', planned: 'Planejado', ideation: 'Ideação' };
+  const STATUS_ORDER = { live: 0, building: 1, planned: 2, ideation: 3 };
+
+  const grid = document.getElementById('product-grid');
+  const lastUpdated = document.getElementById('last-updated');
+  let allProducts = [];
+  let activeFilter = 'all';
+
+  function render(products){
+    if(!products.length){
+      grid.innerHTML = '<p style="color:var(--admin-text-3);grid-column:1/-1">Nenhum produto neste filtro.</p>';
+      return;
+    }
+    grid.innerHTML = products.map(p => {
+      const status = p.status || 'building';
+      const isExternal = status !== 'ideation' && status !== 'planned';
+      const linkTag = isExternal
+        ? `<a class="product-panel-link" href="${p.url}" target="_blank" rel="noopener" aria-label="Abrir ${p.name}">Abrir <span data-icon="external-link"></span></a>`
+        : `<span class="product-panel-link" style="opacity:.5" aria-disabled="true">Em breve</span>`;
+      return `
+        <article class="product-panel" role="listitem" style="--mark-bg:${p.accent};">
+          <div class="product-panel-head">
+            <div class="product-panel-mark" aria-hidden="true">${p.initial}</div>
+            <div class="product-panel-title-block">
+              <div class="product-panel-name">${p.name}</div>
+              <div class="product-panel-domain">${p.domain}</div>
+            </div>
+          </div>
+          <p class="product-panel-tagline">${p.tagline}</p>
+          <div class="product-panel-footer">
+            <span class="status-pill status-pill--${status}">${STATUS_LABEL[status] || status}</span>
+            ${linkTag}
+          </div>
+        </article>
+      `;
+    }).join('');
+    // Hidrata ícones Lucide inseridos agora
+    if(typeof window.farpaIconsHydrate === 'function') window.farpaIconsHydrate(grid);
+  }
+
+  function applyFilter(filter){
+    activeFilter = filter;
+    document.querySelectorAll('.filter-tab').forEach(t=>{
+      const on = t.dataset.filter === filter;
+      t.classList.toggle('is-active', on);
+      t.setAttribute('aria-selected', on ? 'true' : 'false');
+    });
+    const list = filter === 'all' ? allProducts : allProducts.filter(p => (p.status||'building') === filter);
+    render(list);
+  }
+
+  function updateStats(products){
+    const by = { live:0, building:0, planned:0, ideation:0 };
+    products.forEach(p => { by[p.status || 'building'] = (by[p.status || 'building']||0) + 1; });
+    document.getElementById('stat-total').textContent = products.length;
+    document.getElementById('stat-live').textContent = by.live;
+    document.getElementById('stat-building').textContent = by.building;
+    document.getElementById('stat-ideation').textContent = by.ideation;
+    document.getElementById('count-all').textContent = products.length;
+    document.getElementById('count-live').textContent = by.live;
+    document.getElementById('count-building').textContent = by.building;
+    document.getElementById('count-planned').textContent = by.planned;
+    document.getElementById('count-ideation').textContent = by.ideation;
+  }
+
+  // principal (rff82/AI) não está no products.json porque é "self"; injeto virtualmente para o console
+  const PRINCIPAL = {
+    slug: 'principal', name: 'farpa.ai', domain: 'farpa.ai',
+    url: 'https://farpa.ai', tagline: 'Landing do ecossistema e curadoria editorial de inteligência.',
+    accent: '#4338CA', initial: 'F', status: 'live'
+  };
+
+  fetch('/data/products.json', { cache: 'no-cache' })
+    .then(r => r.json())
+    .then(products => {
+      allProducts = [PRINCIPAL, ...products].sort((a,b) => (STATUS_ORDER[a.status]??9) - (STATUS_ORDER[b.status]??9));
+      updateStats(allProducts);
+      render(allProducts);
+      lastUpdated.textContent = 'atualizado ' + new Date().toLocaleString('pt-BR', { dateStyle:'short', timeStyle:'short' });
+    })
+    .catch(err => {
+      console.error('[console] falha ao carregar products.json', err);
+      grid.innerHTML = '<p style="color:var(--admin-err);grid-column:1/-1">Falha ao carregar dados do ecossistema.</p>';
+      lastUpdated.textContent = 'erro';
+    });
+
+  document.querySelectorAll('.filter-tab').forEach(tab => {
+    tab.addEventListener('click', () => applyFilter(tab.dataset.filter));
+  });
+
+  // Toggle alto contraste (secundário, WCAG AAA)
+  const btnAC = document.getElementById('btn-alto-contraste');
+  const storageKey = 'admin-farpa-contrast';
+  function setContrast(on){
+    document.body.classList.toggle('theme-alto-contraste', on);
+    btnAC.setAttribute('aria-pressed', on ? 'true' : 'false');
+    try { localStorage.setItem(storageKey, on ? '1' : '0'); } catch(e) {}
+  }
+  try { if(localStorage.getItem(storageKey) === '1') setContrast(true); } catch(e) {}
+  btnAC.addEventListener('click', () => setContrast(!document.body.classList.contains('theme-alto-contraste')));
+})();
+</script>
+
+</body>
+</html>

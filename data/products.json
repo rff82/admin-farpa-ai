@@ -1,0 +1,112 @@
+[
+  {
+    "slug": "admin",
+    "name": "farpa Admin",
+    "domain": "admin.farpa.ai",
+    "url": "https://admin.farpa.ai",
+    "tagline": "Identity Provider centralizado do ecossistema",
+    "accent": "#4338CA",
+    "initial": "A",
+    "status": "building"
+  },
+  {
+    "slug": "labs",
+    "name": "farpa Labs",
+    "domain": "labs.farpa.ai",
+    "url": "https://labs.farpa.ai",
+    "tagline": "Galeria de MVPs e experimentos com IA generativa",
+    "accent": "#8B5CF6",
+    "initial": "L",
+    "status": "building"
+  },
+  {
+    "slug": "health",
+    "name": "farpa Health",
+    "domain": "health.farpa.ai",
+    "url": "https://health.farpa.ai",
+    "tagline": "Inteligência de saúde com linguagem humana e fontes científicas",
+    "accent": "#10B981",
+    "initial": "H",
+    "status": "building"
+  },
+  {
+    "slug": "fintech",
+    "name": "farpa Fintech",
+    "domain": "fintech.farpa.ai",
+    "url": "https://fintech.farpa.ai",
+    "tagline": "Radar do dinheiro digital — regulação, open finance, BACEN",
+    "accent": "#0EA5E9",
+    "initial": "F",
+    "status": "building"
+  },
+  {
+    "slug": "forte",
+    "name": "farpa Forte",
+    "domain": "forte.farpa.ai",
+    "url": "https://forte.farpa.ai",
+    "tagline": "Agenda e gestão completa para personal trainers",
+    "accent": "#F97316",
+    "initial": "F",
+    "status": "building"
+  },
+  {
+    "slug": "library",
+    "name": "farpa Library",
+    "domain": "library.farpa.ai",
+    "url": "https://library.farpa.ai",
+    "tagline": "Biblioteca educacional modular do ecossistema",
+    "accent": "#4338CA",
+    "initial": "L",
+    "status": "building"
+  },
+  {
+    "slug": "teste",
+    "name": "farpa Teste",
+    "domain": "teste.farpa.ai",
+    "url": "https://teste.farpa.ai",
+    "tagline": "Validador de infraestrutura ponta a ponta (D1 + KV + Workers AI)",
+    "accent": "#4338CA",
+    "initial": "T",
+    "status": "building"
+  },
+  {
+    "slug": "docs",
+    "name": "farpa Docs",
+    "domain": "docs.farpa.ai",
+    "url": "https://docs.farpa.ai",
+    "tagline": "Documentação navegável pública do ecossistema",
+    "accent": "#4338CA",
+    "initial": "D",
+    "status": "planned"
+  },
+  {
+    "slug": "teach",
+    "name": "farpa Teach",
+    "domain": "teach.farpa.ai",
+    "url": "https://teach.farpa.ai",
+    "tagline": "Plataforma para professores criarem material com IA",
+    "accent": "#4338CA",
+    "initial": "T",
+    "status": "ideation"
+  },
+  {
+    "slug": "learn",
+    "name": "farpa Learn",
+    "domain": "learn.farpa.ai",
+    "url": "https://learn.farpa.ai",
+    "tagline": "Aprendizado interativo para alunos",
+    "accent": "#4338CA",
+    "initial": "L",
+    "status": "ideation"
+  },
+  {
+    "slug": "space",
+    "name": "farpa Space",
+    "domain": "space.farpa.ai",
+    "url": "https://space.farpa.ai",
+    "tagline": "Espaço de cowork físico/digital",
+    "accent": "#4338CA",
+    "initial": "S",
+    "status": "ideation"
+  }
+]
