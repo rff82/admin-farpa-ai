@@ -22,4 +22,8 @@ export interface Env {
   APPLE_CLIENT_SECRET_IDP?: string;
   MICROSOFT_CLIENT_ID_IDP?: string;
   MICROSOFT_CLIENT_SECRET_IDP?: string;
+
+  // Local admin credentials (wrangler secret put)
+  ADMIN_USERNAME?: string;
+  ADMIN_PASSWORD?: string;
 }

@@ -146,6 +146,8 @@ npx wrangler secret put MICROSOFT_CLIENT_SECRET_IDP
 npx wrangler secret put JWT_SIGNING_KEY_CURRENT   # openssl rand -base64 64
 npx wrangler secret put SESSION_COOKIE_SECRET     # openssl rand -base64 48
 npx wrangler secret put ALLOWED_ORIGIN            # https://admin.farpa.ai
+npx wrangler secret put ADMIN_USERNAME            # nicole-usr
+npx wrangler secret put ADMIN_PASSWORD            # nicole-pws (usado só no 1º login — depois hash fica no D1)
 
 npx wrangler deploy
 ```

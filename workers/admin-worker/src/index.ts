@@ -8,6 +8,7 @@ import { handleAuthorize } from "./authorize";
 import { handleToken } from "./token";
 import { handleUserinfo } from "./userinfo";
 import { startGoogle, callbackGoogle, notImplemented } from "./social";
+import { handleLocalLogin } from "./locallogin";
 import { readSessionCookie, loadSession, revokeSession, clearSessionCookie } from "./session";
 import { json, text, oauthError, handlePreflight, isAllowedOrigin } from "./util";
 
@@ -45,6 +46,9 @@ export default {
       if (p === "/oauth/userinfo") return handleUserinfo(req, env);
       if (p === "/oauth/revoke" && req.method === "POST") return handleRevoke(req, env);
       if (p === "/oauth/logout") return handleLogout(req, env);
+
+      // Local admin login
+      if (p === "/login" && req.method === "POST") return handleLocalLogin(req, env);
 
       // Social start/callback
       if (p === "/oauth/google/start")    return startGoogle(req, env);

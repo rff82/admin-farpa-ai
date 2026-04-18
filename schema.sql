@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS users (
   picture_url     TEXT,
   provider        TEXT NOT NULL,                  -- 'google' | 'apple' | 'microsoft' | 'local'
   provider_sub    TEXT NOT NULL,                  -- subject único no IdP upstream
+  password_hash   TEXT,                           -- PBKDF2-SHA256 (salt:hash base64) — só provider='local'
   mfa_enabled     INTEGER NOT NULL DEFAULT 0,
   mfa_secret      TEXT,                           -- TOTP base32, criptografado com SESSION_COOKIE_SECRET
   last_login_at   INTEGER,
