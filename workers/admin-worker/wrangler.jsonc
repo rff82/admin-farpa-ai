@@ -10,6 +10,7 @@
     { "pattern": "admin.farpa.ai/oauth/*", "zone_name": "farpa.ai" },
     { "pattern": "admin.farpa.ai/.well-known/*", "zone_name": "farpa.ai" },
     { "pattern": "admin.farpa.ai/health", "zone_name": "farpa.ai" },
+    { "pattern": "admin.farpa.ai/login", "zone_name": "farpa.ai" },
     { "pattern": "admin.farpa.ai/admin/*", "zone_name": "farpa.ai" }
   ],
   "d1_databases": [
