@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<!-- farpa.ai · admin-farpa-ai · dashboard.html · v0.1 · 2026-04-18 -->
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0B0B12">
+<meta name="robots" content="noindex,nofollow">
+<title>Dashboard · farpa Admin</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%234338CA'/%3E%3Ctext x='12' y='17' text-anchor='middle' font-family='monospace' font-weight='700' font-size='14' fill='white'%3EA%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="themes.css">
+<link rel="stylesheet" href="logo-system.css">
+<link rel="stylesheet" href="admin.css">
+<style>
+/* ── Dashboard-only styles ── */
+.dash-layout {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  min-height: 100vh;
+}
+
+/* Sidebar */
+.dash-sidebar {
+  position: sticky; top: 0; height: 100vh; overflow-y: auto;
+  background: var(--admin-bg-elev);
+  border-right: 1px solid var(--admin-border);
+  display: flex; flex-direction: column;
+  padding: 24px 0 32px;
+  z-index: 5;
+}
+.dash-sidebar-logo {
+  padding: 0 20px 24px;
+  border-bottom: 1px solid var(--admin-border);
+  margin-bottom: 16px;
+}
+.dash-nav { flex: 1; }
+.dash-nav-section {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--admin-text-3);
+  padding: 16px 20px 8px;
+}
+.dash-nav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 20px;
+  color: var(--admin-text-2);
+  font-size: 13px; font-weight: 500;
+  cursor: pointer;
+  transition: background 150ms, color 150ms;
+  border: none; background: transparent; width: 100%;
+  text-align: left; text-decoration: none;
+}
+.dash-nav-item:hover, .dash-nav-item.is-active {
+  background: rgba(67,56,202,0.12);
+  color: var(--admin-text-1);
+}
+.dash-nav-item.is-active { color: var(--admin-primary); }
+.dash-nav-item [data-icon] { width: 16px; height: 16px; flex-shrink: 0; }
+.dash-nav-item [data-icon] svg { width: 100%; height: 100%; }
+.dash-sidebar-footer {
+  padding: 16px 20px 0;
+  border-top: 1px solid var(--admin-border);
+}
+.dash-user-info {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 12px;
+}
+.dash-avatar {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: var(--admin-primary);
+  color: #fff;
+  display: grid; place-items: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700; font-size: 13px;
+  flex-shrink: 0;
+}
+.dash-user-name { font-size: 13px; font-weight: 600; color: var(--admin-text-1); }
+.dash-user-role {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--admin-text-3);
+}
+
+/* Main content */
+.dash-content {
+  position: relative; z-index: 1;
+  background: var(--admin-bg);
+  overflow-y: auto;
+}
+.dash-topbar {
+  position: sticky; top: 0; z-index: 4;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 32px;
+  background: color-mix(in srgb, var(--admin-bg) 85%, transparent);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--admin-border);
+}
+.dash-topbar-title { font-size: 16px; font-weight: 700; letter-spacing: -0.01em; }
+.dash-topbar-actions { display: flex; align-items: center; gap: 10px; }
+.dash-page { padding: 32px; max-width: 1100px; }
+
+/* Section within page */
+.dash-section { margin-bottom: 48px; }
+.dash-section-title {
+  font-size: 18px; font-weight: 700; letter-spacing: -0.01em;
+  margin: 0 0 4px;
+}
+.dash-section-meta {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; letter-spacing: 0.06em;
+  color: var(--admin-text-3); text-transform: uppercase;
+  margin-bottom: 20px;
+}
+
+/* KPI cards row */
+.kpi-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 14px;
+  margin-bottom: 40px;
+}
+.kpi-card {
+  padding: 18px 20px;
+  background: var(--admin-bg-elev);
+  border: 1px solid var(--admin-border);
+  border-radius: var(--admin-radius);
+  position: relative; overflow: hidden;
+}
+.kpi-card::after {
+  content: "";
+  position: absolute; bottom: 0; left: 0; right: 0;
+  height: 2px;
+  background: var(--kpi-color, var(--admin-primary));
+  opacity: 0.5;
+}
+.kpi-icon {
+  width: 32px; height: 32px;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--kpi-color, var(--admin-primary)) 18%, transparent);
+  display: grid; place-items: center;
+  margin-bottom: 14px;
+}
+.kpi-icon [data-icon] { width: 16px; height: 16px; }
+.kpi-icon [data-icon] svg { width: 100%; height: 100%; color: var(--kpi-color, var(--admin-primary)); }
+.kpi-value {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 28px; font-weight: 700; letter-spacing: -0.02em;
+  color: var(--admin-text-1); line-height: 1;
+}
+.kpi-label {
+  margin-top: 6px;
+  font-size: 12px; letter-spacing: 0.03em;
+  color: var(--admin-text-3); text-transform: uppercase;
+}
+.kpi-delta {
+  margin-top: 4px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--admin-ok);
+}
+
+/* Status bar chart */
+.status-bars { display: flex; flex-direction: column; gap: 10px; }
+.status-bar-row { display: flex; align-items: center; gap: 12px; }
+.status-bar-label {
+  font-size: 12px; color: var(--admin-text-2);
+  width: 110px; flex-shrink: 0; text-align: right;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.status-bar-track {
+  flex: 1; height: 8px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 99px; overflow: hidden;
+}
+.status-bar-fill {
+  height: 100%; border-radius: 99px;
+  background: var(--bar-color, var(--admin-primary));
+  transition: width 600ms ease;
+}
+.status-bar-count {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px; color: var(--admin-text-2);
+  width: 24px; text-align: right;
+}
+
+/* Table */
+.dash-table-wrap {
+  background: var(--admin-bg-elev);
+  border: 1px solid var(--admin-border);
+  border-radius: var(--admin-radius);
+  overflow: hidden;
+}
+.dash-table {
+  width: 100%; border-collapse: collapse;
+  font-size: 13px;
+}
+.dash-table th {
+  padding: 12px 16px;
+  background: rgba(255,255,255,0.03);
+  border-bottom: 1px solid var(--admin-border);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--admin-text-3);
+  text-align: left; font-weight: 500;
+}
+.dash-table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--admin-border);
+  color: var(--admin-text-1);
+  vertical-align: middle;
+}
+.dash-table tr:last-child td { border-bottom: none; }
+.dash-table tbody tr:hover td { background: rgba(255,255,255,0.02); }
+.td-mono {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; letter-spacing: 0.04em;
+  color: var(--admin-text-3);
+}
+.td-email { color: var(--admin-text-2); font-size: 12px; }
+.td-provider {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 3px 8px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 5px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--admin-text-2);
+}
+.table-empty {
+  padding: 32px; text-align: center;
+  color: var(--admin-text-3); font-size: 13px;
+}
+.badge-active {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 3px 8px; border-radius: 99px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase;
+  background: color-mix(in srgb, var(--admin-ok) 15%, transparent);
+  color: var(--admin-ok);
+  border: 1px solid color-mix(in srgb, var(--admin-ok) 30%, transparent);
+}
+.badge-inactive {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 3px 8px; border-radius: 99px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase;
+  background: rgba(255,255,255,0.04);
+  color: var(--admin-text-3);
+  border: 1px solid var(--admin-border);
+}
+
+/* Two-column section */
+.dash-two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+/* Loading skeleton */
+.skel {
+  background: linear-gradient(90deg,
+    rgba(255,255,255,0.04) 25%,
+    rgba(255,255,255,0.08) 50%,
+    rgba(255,255,255,0.04) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+  border-radius: 6px;
+  display: inline-block;
+}
+@keyframes shimmer { to { background-position: -200% 0; } }
+
+/* Refresh btn */
+.btn-icon {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 7px 12px;
+  background: transparent;
+  border: 1px solid var(--admin-border);
+  border-radius: var(--admin-radius-sm);
+  color: var(--admin-text-3);
+  font: inherit; font-size: 12px;
+  cursor: pointer; transition: all 150ms;
+}
+.btn-icon:hover { border-color: var(--admin-primary); color: var(--admin-text-1); }
+.btn-icon [data-icon] { width: 14px; height: 14px; }
+.btn-icon [data-icon] svg { width: 100%; height: 100%; }
+
+/* Mobile */
+@media (max-width: 768px) {
+  .dash-layout { grid-template-columns: 1fr; }
+  .dash-sidebar { display: none; }
+  .dash-page { padding: 20px 16px; }
+  .dash-two-col { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<div class="dash-layout">
+
+  <!-- Sidebar -->
+  <aside class="dash-sidebar">
+    <div class="dash-sidebar-logo">
+      <a href="/" class="farpa-logo" style="--logo-mark-bg: var(--admin-primary);">
+        <div class="farpa-logo-mark farpa-logo-mark--md">A</div>
+        <div class="farpa-logo-text">
+          <span class="farpa-logo-wordmark">farpa</span>
+          <span class="farpa-logo-sublabel">admin</span>
+        </div>
+      </a>
+    </div>
+
+    <nav class="dash-nav">
+      <div class="dash-nav-section">Geral</div>
+      <button class="dash-nav-item is-active" data-view="overview">
+        <span data-icon="layout-dashboard"></span>
+        <span>Visão geral</span>
+      </button>
+      <button class="dash-nav-item" data-view="products">
+        <span data-icon="grid-2x2"></span>
+        <span>Produtos</span>
+      </button>
+
+      <div class="dash-nav-section">Identidade</div>
+      <button class="dash-nav-item" data-view="users">
+        <span data-icon="users"></span>
+        <span>Usuários</span>
+      </button>
+      <button class="dash-nav-item" data-view="clients">
+        <span data-icon="key"></span>
+        <span>Clients OAuth</span>
+      </button>
+
+      <div class="dash-nav-section">Sistema</div>
+      <a class="dash-nav-item" href="/" target="_blank" rel="noopener">
+        <span data-icon="globe"></span>
+        <span>Console público</span>
+      </a>
+    </nav>
+
+    <div class="dash-sidebar-footer">
+      <div class="dash-user-info">
+        <div class="dash-avatar" id="sidebar-avatar">A</div>
+        <div>
+          <div class="dash-user-name" id="sidebar-name">Admin</div>
+          <div class="dash-user-role">Administrador</div>
+        </div>
+      </div>
+      <a class="dash-nav-item" href="/oauth/logout" style="color:var(--admin-err)">
+        <span data-icon="log-out"></span>
+        <span>Sair</span>
+      </a>
+    </div>
+  </aside>
+
+  <!-- Main content -->
+  <div class="dash-content">
+    <div class="dash-topbar">
+      <div class="dash-topbar-title" id="topbar-title">Visão geral</div>
+      <div class="dash-topbar-actions">
+        <button class="btn-icon" id="btn-refresh">
+          <span data-icon="refresh-cw"></span>
+          <span>Atualizar</span>
+        </button>
+        <button class="admin-btn" id="btn-alto-contraste" type="button" aria-pressed="false" aria-label="Ativar alto contraste">
+          <span data-icon="contrast"></span>
+        </button>
+      </div>
+    </div>
+
+    <div class="dash-page">
+
+      <!-- VIEW: overview -->
+      <div id="view-overview">
+        <div class="kpi-row" id="kpi-row">
+          <div class="kpi-card" style="--kpi-color:#4338CA">
+            <div class="kpi-icon"><span data-icon="grid-2x2"></span></div>
+            <div class="kpi-value" id="kpi-produtos">—</div>
+            <div class="kpi-label">Produtos</div>
+          </div>
+          <div class="kpi-card" style="--kpi-color:#22C55E">
+            <div class="kpi-icon"><span data-icon="radio"></span></div>
+            <div class="kpi-value" id="kpi-live">—</div>
+            <div class="kpi-label">No ar</div>
+          </div>
+          <div class="kpi-card" style="--kpi-color:#F59E0B">
+            <div class="kpi-icon"><span data-icon="hammer"></span></div>
+            <div class="kpi-value" id="kpi-building">—</div>
+            <div class="kpi-label">Em construção</div>
+          </div>
+          <div class="kpi-card" style="--kpi-color:#0EA5E9">
+            <div class="kpi-icon"><span data-icon="users"></span></div>
+            <div class="kpi-value" id="kpi-users">—</div>
+            <div class="kpi-label">Usuários</div>
+          </div>
+          <div class="kpi-card" style="--kpi-color:#8B5CF6">
+            <div class="kpi-icon"><span data-icon="key"></span></div>
+            <div class="kpi-value" id="kpi-clients">—</div>
+            <div class="kpi-label">Clients OAuth</div>
+          </div>
+        </div>
+
+        <div class="dash-two-col">
+          <div>
+            <div class="dash-section">
+              <div class="dash-section-title">Status do ecossistema</div>
+              <div class="dash-section-meta" id="eco-last-updated">carregando…</div>
+              <div class="status-bars" id="status-bars">
+                <div class="status-bar-row">
+                  <div class="status-bar-label">No ar</div>
+                  <div class="status-bar-track"><div class="status-bar-fill" id="bar-live" style="width:0%;--bar-color:#22C55E"></div></div>
+                  <div class="status-bar-count" id="bar-live-n">0</div>
+                </div>
+                <div class="status-bar-row">
+                  <div class="status-bar-label">Construção</div>
+                  <div class="status-bar-track"><div class="status-bar-fill" id="bar-building" style="width:0%;--bar-color:#F59E0B"></div></div>
+                  <div class="status-bar-count" id="bar-building-n">0</div>
+                </div>
+                <div class="status-bar-row">
+                  <div class="status-bar-label">Planejado</div>
+                  <div class="status-bar-track"><div class="status-bar-fill" id="bar-planned" style="width:0%;--bar-color:#70707A"></div></div>
+                  <div class="status-bar-count" id="bar-planned-n">0</div>
+                </div>
+                <div class="status-bar-row">
+                  <div class="status-bar-label">Ideação</div>
+                  <div class="status-bar-track"><div class="status-bar-fill" id="bar-ideation" style="width:0%;--bar-color:#4338CA"></div></div>
+                  <div class="status-bar-count" id="bar-ideation-n">0</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="dash-section">
+              <div class="dash-section-title">Usuários recentes</div>
+              <div class="dash-section-meta">últimos cadastros</div>
+              <div class="dash-table-wrap">
+                <table class="dash-table">
+                  <thead>
+                    <tr>
+                      <th>Nome</th>
+                      <th>Provider</th>
+                      <th>Cadastro</th>
+                    </tr>
+                  </thead>
+                  <tbody id="recent-users-tbody">
+                    <tr><td colspan="3" class="table-empty">carregando…</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="dash-section">
+          <div class="dash-section-title">Produtos do ecossistema</div>
+          <div class="dash-section-meta" id="products-overview-meta">carregando…</div>
+          <div class="product-grid" id="products-overview-grid"></div>
+        </div>
+      </div>
+
+      <!-- VIEW: products -->
+      <div id="view-products" style="display:none">
+        <div class="dash-section-title" style="margin-bottom:8px">Produtos</div>
+        <div class="dash-section-meta" id="products-meta">carregando…</div>
+        <div class="filter-tabs" role="tablist">
+          <button class="filter-tab is-active" data-pfilter="all" role="tab">Todos <span class="filter-tab-count" id="pcount-all">0</span></button>
+          <button class="filter-tab" data-pfilter="live" role="tab">No ar <span class="filter-tab-count" id="pcount-live">0</span></button>
+          <button class="filter-tab" data-pfilter="building" role="tab">Em construção <span class="filter-tab-count" id="pcount-building">0</span></button>
+          <button class="filter-tab" data-pfilter="planned" role="tab">Planejado <span class="filter-tab-count" id="pcount-planned">0</span></button>
+          <button class="filter-tab" data-pfilter="ideation" role="tab">Ideação <span class="filter-tab-count" id="pcount-ideation">0</span></button>
+        </div>
+        <div class="product-grid" id="products-full-grid"></div>
+      </div>
+
+      <!-- VIEW: users -->
+      <div id="view-users" style="display:none">
+        <div class="dash-section-title" style="margin-bottom:4px">Usuários</div>
+        <div class="dash-section-meta" id="users-meta">carregando…</div>
+        <div class="dash-table-wrap">
+          <table class="dash-table">
+            <thead>
+              <tr>
+                <th>Nome</th>
+                <th>E-mail</th>
+                <th>Provider</th>
+                <th>Último login</th>
+                <th>Cadastro</th>
+              </tr>
+            </thead>
+            <tbody id="users-tbody">
+              <tr><td colspan="5" class="table-empty">carregando…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- VIEW: clients -->
+      <div id="view-clients" style="display:none">
+        <div class="dash-section-title" style="margin-bottom:4px">Clients OAuth</div>
+        <div class="dash-section-meta" id="clients-meta">carregando…</div>
+        <div class="dash-table-wrap">
+          <table class="dash-table">
+            <thead>
+              <tr>
+                <th>Nome</th>
+                <th>Client ID</th>
+                <th>Scopes</th>
+                <th>Status</th>
+                <th>Criado em</th>
+              </tr>
+            </thead>
+            <tbody id="clients-tbody">
+              <tr><td colspan="5" class="table-empty">carregando…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div><!-- /dash-page -->
+  </div><!-- /dash-content -->
+</div><!-- /dash-layout -->
+
+<script src="icons.js"></script>
+<script>
+(function(){
+  /* ── helpers ── */
+  const STATUS_LABEL = { live:'No ar', building:'Em construção', planned:'Planejado', ideation:'Ideação' };
+  const STATUS_ORDER = { live:0, building:1, planned:2, ideation:3 };
+  const fmt = (ts) => ts ? new Date(ts * 1000).toLocaleString('pt-BR', { dateStyle:'short', timeStyle:'short' }) : '—';
+
+  /* ── data stores ── */
+  let allProducts = [];
+  let allUsers = [];
+  let allClients = [];
+
+  /* ── alto contraste ── */
+  const btnAC = document.getElementById('btn-alto-contraste');
+  const storageKey = 'admin-farpa-contrast';
+  function setContrast(on){
+    document.body.classList.toggle('theme-alto-contraste', on);
+    btnAC.setAttribute('aria-pressed', on ? 'true' : 'false');
+    try { localStorage.setItem(storageKey, on ? '1' : '0'); } catch(e){}
+  }
+  try { if(localStorage.getItem(storageKey) === '1') setContrast(true); } catch(e){}
+  btnAC.addEventListener('click', () => setContrast(!document.body.classList.contains('theme-alto-contraste')));
+
+  /* ── nav ── */
+  const views = { overview: 'view-overview', products: 'view-products', users: 'view-users', clients: 'view-clients' };
+  const viewTitles = { overview: 'Visão geral', products: 'Produtos', users: 'Usuários', clients: 'Clients OAuth' };
+  let currentView = 'overview';
+
+  function switchView(v){
+    currentView = v;
+    document.getElementById('topbar-title').textContent = viewTitles[v];
+    Object.entries(views).forEach(([k, id]) => {
+      document.getElementById(id).style.display = k === v ? '' : 'none';
+    });
+    document.querySelectorAll('.dash-nav-item[data-view]').forEach(el => {
+      el.classList.toggle('is-active', el.dataset.view === v);
+    });
+    if (v === 'users') renderUsers();
+    if (v === 'clients') renderClients();
+  }
+
+  document.querySelectorAll('.dash-nav-item[data-view]').forEach(el => {
+    el.addEventListener('click', () => switchView(el.dataset.view));
+  });
+
+  /* ── product rendering ── */
+  function productHTML(p){
+    const status = p.status || 'building';
+    const isExternal = status !== 'ideation' && status !== 'planned';
+    const linkTag = isExternal
+      ? `<a class="product-panel-link" href="${p.url}" target="_blank" rel="noopener">Abrir <span data-icon="external-link"></span></a>`
+      : `<span class="product-panel-link" style="opacity:.5" aria-disabled="true">Em breve</span>`;
+    return `
+      <article class="product-panel" role="listitem" style="--mark-bg:${p.accent};">
+        <div class="product-panel-head">
+          <div class="product-panel-mark">${p.initial}</div>
+          <div class="product-panel-title-block">
+            <div class="product-panel-name">${p.name}</div>
+            <div class="product-panel-domain">${p.domain}</div>
+          </div>
+        </div>
+        <p class="product-panel-tagline">${p.tagline}</p>
+        <div class="product-panel-footer">
+          <span class="status-pill status-pill--${status}">${STATUS_LABEL[status]||status}</span>
+          ${linkTag}
+        </div>
+      </article>`;
+  }
+
+  function hydrateIcons(el){ if(typeof window.farpaIconsHydrate === 'function') window.farpaIconsHydrate(el); }
+
+  /* ── products data ── */
+  const PRINCIPAL = {
+    slug:'principal', name:'farpa.ai', domain:'farpa.ai', url:'https://farpa.ai',
+    tagline:'Landing do ecossistema e curadoria editorial de inteligência.',
+    accent:'#4338CA', initial:'F', status:'live'
+  };
+
+  function renderProductsOverview(){
+    const grid = document.getElementById('products-overview-grid');
+    grid.innerHTML = allProducts.map(productHTML).join('');
+    hydrateIcons(grid);
+    document.getElementById('products-overview-meta').textContent =
+      allProducts.length + ' produtos · ' + new Date().toLocaleString('pt-BR', {dateStyle:'short',timeStyle:'short'});
+  }
+
+  function renderProductsFull(filter){
+    const list = filter === 'all' ? allProducts : allProducts.filter(p => (p.status||'building') === filter);
+    const grid = document.getElementById('products-full-grid');
+    if(!list.length){
+      grid.innerHTML = '<p style="color:var(--admin-text-3);grid-column:1/-1">Nenhum produto neste filtro.</p>';
+    } else {
+      grid.innerHTML = list.map(productHTML).join('');
+      hydrateIcons(grid);
+    }
+  }
+
+  function updateProductCounts(){
+    const by = {live:0,building:0,planned:0,ideation:0};
+    allProducts.forEach(p => { const s = p.status||'building'; by[s] = (by[s]||0)+1; });
+    const total = allProducts.length;
+
+    ['all','live','building','planned','ideation'].forEach(k => {
+      const el = document.getElementById('pcount-'+k);
+      if(el) el.textContent = k === 'all' ? total : (by[k]||0);
+    });
+    document.getElementById('kpi-produtos').textContent = total;
+    document.getElementById('kpi-live').textContent = by.live;
+    document.getElementById('kpi-building').textContent = by.building;
+
+    const barMax = Math.max(by.live,by.building,by.planned,by.ideation,1);
+    [['live','#22C55E'],['building','#F59E0B'],['planned','#70707A'],['ideation','#4338CA']].forEach(([k])=>{
+      const fill = document.getElementById('bar-'+k);
+      const count = document.getElementById('bar-'+k+'-n');
+      if(fill) fill.style.width = ((by[k]||0)/barMax*100)+'%';
+      if(count) count.textContent = by[k]||0;
+    });
+
+    document.getElementById('eco-last-updated').textContent =
+      'atualizado ' + new Date().toLocaleString('pt-BR', {dateStyle:'short',timeStyle:'short'});
+    document.getElementById('products-meta').textContent = total + ' produtos registrados';
+  }
+
+  document.querySelectorAll('[data-pfilter]').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('[data-pfilter]').forEach(t => {
+        const on = t.dataset.pfilter === tab.dataset.pfilter;
+        t.classList.toggle('is-active', on);
+        t.setAttribute('aria-selected', on ? 'true' : 'false');
+      });
+      renderProductsFull(tab.dataset.pfilter);
+    });
+  });
+
+  /* ── users ── */
+  function renderUsers(){
+    const tbody = document.getElementById('users-tbody');
+    if(!allUsers.length){
+      tbody.innerHTML = '<tr><td colspan="5" class="table-empty">Nenhum usuário encontrado.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = allUsers.map(u => `
+      <tr>
+        <td>${u.name || '—'}</td>
+        <td class="td-email">${u.email || '—'}</td>
+        <td><span class="td-provider">${u.provider || '—'}</span></td>
+        <td class="td-mono">${fmt(u.last_login_at)}</td>
+        <td class="td-mono">${fmt(u.created_at)}</td>
+      </tr>`).join('');
+    document.getElementById('users-meta').textContent = allUsers.length + ' usuário(s)';
+  }
+
+  function renderRecentUsers(){
+    const tbody = document.getElementById('recent-users-tbody');
+    const recent = allUsers.slice(0,5);
+    if(!recent.length){
+      tbody.innerHTML = '<tr><td colspan="3" class="table-empty">Nenhum usuário.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = recent.map(u => `
+      <tr>
+        <td>${u.name||'—'}</td>
+        <td><span class="td-provider">${u.provider||'—'}</span></td>
+        <td class="td-mono">${fmt(u.created_at)}</td>
+      </tr>`).join('');
+    document.getElementById('kpi-users').textContent = allUsers.length;
+  }
+
+  /* ── clients ── */
+  function renderClients(){
+    const tbody = document.getElementById('clients-tbody');
+    if(!allClients.length){
+      tbody.innerHTML = '<tr><td colspan="5" class="table-empty">Nenhum client OAuth cadastrado.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = allClients.map(c => {
+      const scopes = Array.isArray(c.scopes) ? c.scopes.join(', ') : (c.scopes||'—');
+      const badge = c.is_active
+        ? '<span class="badge-active">Ativo</span>'
+        : '<span class="badge-inactive">Inativo</span>';
+      return `
+        <tr>
+          <td>${c.name||'—'}</td>
+          <td class="td-mono">${c.client_id||'—'}</td>
+          <td class="td-mono" style="font-size:10px">${scopes}</td>
+          <td>${badge}</td>
+          <td class="td-mono">${fmt(c.created_at)}</td>
+        </tr>`;
+    }).join('');
+    document.getElementById('clients-meta').textContent = allClients.length + ' client(s) OAuth';
+    document.getElementById('kpi-clients').textContent = allClients.length;
+  }
+
+  /* ── fetch all ── */
+  async function loadAll(){
+    // Auth check + users
+    try {
+      const res = await fetch('/admin/users');
+      if(res.status === 401){
+        location.href = '/signin?return_to=/dashboard';
+        return;
+      }
+      const data = await res.json();
+      allUsers = data.users || [];
+    } catch(e){
+      allUsers = [];
+    }
+
+    // Clients
+    try {
+      const res = await fetch('/admin/clients');
+      const data = await res.json();
+      allClients = data.clients || [];
+    } catch(e){
+      allClients = [];
+    }
+
+    // Products
+    try {
+      const res = await fetch('/data/products.json', {cache:'no-cache'});
+      const products = await res.json();
+      allProducts = [PRINCIPAL, ...products].sort((a,b) => (STATUS_ORDER[a.status]??9)-(STATUS_ORDER[b.status]??9));
+    } catch(e){
+      allProducts = [PRINCIPAL];
+    }
+
+    // Update sidebar username
+    if(allUsers.length){
+      const admin = allUsers.find(u => u.provider === 'local') || allUsers[0];
+      const name = (admin.name || admin.email || 'Admin').split(' ')[0];
+      const el = document.getElementById('sidebar-name');
+      const av = document.getElementById('sidebar-avatar');
+      if(el) el.textContent = name;
+      if(av) av.textContent = name[0].toUpperCase();
+    }
+
+    updateProductCounts();
+    renderProductsOverview();
+    renderProductsFull('all');
+    renderRecentUsers();
+    if(currentView === 'users') renderUsers();
+    if(currentView === 'clients') renderClients();
+  }
+
+  document.getElementById('btn-refresh').addEventListener('click', loadAll);
+
+  loadAll();
+})();
+</script>
+</body>
+</html>
