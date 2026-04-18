@@ -45,7 +45,7 @@ export async function handleLocalLogin(req: Request, env: Env): Promise<Response
   const password = body.get("password") || "";
   const returnTo = body.get("return_to") || "/";
 
-  const loginUrl = new URL("/login.html", env.ISSUER);
+  const loginUrl = new URL("/signin", env.ISSUER);
   if (returnTo && returnTo !== "/") loginUrl.searchParams.set("return_to", returnTo);
 
   const fail = () => {

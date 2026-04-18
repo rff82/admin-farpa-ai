@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<!-- farpa.ai · admin-farpa-ai · signin.html · v0.2 · 2026-04-18 -->
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0B0B12">
+<meta name="robots" content="noindex,nofollow">
+<title>Entrar · farpa Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="themes.css">
+<link rel="stylesheet" href="logo-system.css">
+<link rel="stylesheet" href="admin.css">
+<style>
+  .login-wrap { min-height: 100vh; display: grid; place-items: center; padding: 32px; position: relative; z-index: 1; }
+  .login-card {
+    width: 100%; max-width: 420px;
+    padding: 40px 36px;
+    background: var(--admin-bg-elev);
+    border: 1px solid var(--admin-border);
+    border-radius: 18px;
+    box-shadow: 0 20px 60px -20px rgba(0,0,0,0.5);
+  }
+  .login-title { font-size: 24px; font-weight: 700; margin: 18px 0 6px; letter-spacing: -0.01em; }
+  .login-sub { color: var(--admin-text-2); font-size: 14px; margin: 0 0 28px; line-height: 1.5; }
+  .login-form { display: flex; flex-direction: column; gap: 14px; }
+  .field-label {
+    display: block;
+    font-size: 12px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase;
+    color: var(--admin-text-2); margin-bottom: 6px;
+  }
+  .field-input {
+    width: 100%; box-sizing: border-box;
+    padding: 11px 14px;
+    background: var(--admin-bg-base);
+    border: 1px solid var(--admin-border);
+    border-radius: 10px;
+    color: var(--admin-text-1);
+    font: inherit; font-size: 14px;
+    transition: border-color 160ms;
+    outline: none;
+  }
+  .field-input:focus { border-color: var(--admin-primary); }
+  .field-input::placeholder { color: var(--admin-text-3); }
+  .btn-primary {
+    width: 100%; padding: 12px 14px; margin-top: 4px;
+    background: var(--admin-primary);
+    border: none; border-radius: 10px;
+    color: #fff; font: inherit; font-size: 14px; font-weight: 600;
+    cursor: pointer; transition: opacity 160ms;
+  }
+  .btn-primary:hover { opacity: 0.88; }
+  .login-error {
+    display: flex; align-items: center; gap: 8px;
+    padding: 11px 14px;
+    background: color-mix(in srgb, #ef4444 12%, transparent);
+    border: 1px solid color-mix(in srgb, #ef4444 40%, transparent);
+    border-radius: 10px;
+    font-size: 13px; color: #fca5a5;
+  }
+  .login-footer-link {
+    display: inline-flex; align-items: center; gap: 6px;
+    margin-top: 24px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--admin-text-3);
+  }
+  .login-footer-link:hover { color: var(--admin-text-1); }
+  .login-footer-link [data-icon] { width: 12px; height: 12px; }
+  .login-footer-link [data-icon] svg { width: 100%; height: 100%; }
+</style>
+</head>
+<body>
+
+<div class="login-wrap">
+  <div class="login-card">
+    <a href="/" class="farpa-logo" style="--logo-mark-bg: var(--admin-primary);">
+      <div class="farpa-logo-mark farpa-logo-mark--lg">A</div>
+      <div class="farpa-logo-text">
+        <span class="farpa-logo-wordmark">farpa</span>
+        <span class="farpa-logo-sublabel">admin.farpa.ai</span>
+      </div>
+    </a>
+
+    <h1 class="login-title">Entrar no ecossistema</h1>
+    <p class="login-sub">Acesso restrito ao administrador do ecossistema farpa.</p>
+
+    <form class="login-form" method="POST" action="/login" autocomplete="on">
+      <input type="hidden" name="return_to" id="return_to" value="/">
+
+      <div id="login-error" class="login-error" style="display:none;">
+        <span data-icon="alert-circle"></span>
+        <span>Usuário ou senha incorretos.</span>
+      </div>
+
+      <div>
+        <label class="field-label" for="username">Usuário</label>
+        <input class="field-input" type="text" id="username" name="username"
+               placeholder="nome de usuário" autocomplete="username" required autofocus>
+      </div>
+      <div>
+        <label class="field-label" for="password">Senha</label>
+        <input class="field-input" type="password" id="password" name="password"
+               placeholder="••••••••" autocomplete="current-password" required>
+      </div>
+
+      <button class="btn-primary" type="submit">
+        Entrar
+      </button>
+    </form>
+
+    <a class="login-footer-link" href="/">
+      <span data-icon="arrow-left"></span>
+      <span>Voltar ao console</span>
+    </a>
+  </div>
+</div>
+
+<script src="icons.js"></script>
+<script>
+  const p = new URLSearchParams(location.search);
+  const rt = p.get("return_to");
+  if (rt) document.getElementById("return_to").value = rt;
+  if (p.get("error")) document.getElementById("login-error").style.display = "flex";
+</script>
+</body>
+</html>

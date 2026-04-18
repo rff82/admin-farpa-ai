@@ -49,7 +49,7 @@ export default {
 
       // Local admin login
       if (p === "/login" && req.method === "GET") {
-        const dest = new URL("/login.html", env.ISSUER);
+        const dest = new URL("/signin.html", env.ISSUER);
         const rt = url.searchParams.get("return_to");
         if (rt) dest.searchParams.set("return_to", rt);
         return Response.redirect(dest.toString(), 302);
